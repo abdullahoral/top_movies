@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by User on 06-Mar-18.
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.RvMainItemViewHolder> {
 
     private Context mContext;
-    private ArrayList<RvMainItem> mRvMainItemList;
+    private List<RvMainItem> mRvMainItemList;
     private OnItemClickListener mListener;
 
 
@@ -31,7 +31,7 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
         mListener = listener;
     }
 
-    public RvMainItemAdapter (Context context, ArrayList<RvMainItem> rvMainItemList) {
+    public RvMainItemAdapter (Context context, List<RvMainItem> rvMainItemList) {
         mContext = context;
         mRvMainItemList = rvMainItemList;
     }
@@ -65,7 +65,7 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
         return mRvMainItemList.size();
     }
 
-    public ArrayList<RvMainItem> getmRvMainItemList() {
+    public List<RvMainItem> getmRvMainItemList() {
         return mRvMainItemList;
     }
 
@@ -73,7 +73,7 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
      * When data changes, this method updates the list of taskEntries
      * and notifies the adapter to use the new values on it
      */
-    public void setmRvMainItemList(ArrayList<RvMainItem> rvMainItems) {
+    public void setmRvMainItemList(List<RvMainItem> rvMainItems) {
         mRvMainItemList = rvMainItems;
         notifyDataSetChanged();
     }

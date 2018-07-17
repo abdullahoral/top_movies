@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by User on 06-Mar-18.
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class RvVideosAdapter extends RecyclerView.Adapter<RvVideosAdapter.RvVideosItemViewHolder> {
 
     private Context mContext;
-    private ArrayList<RvVideosItem> mRvVideosItemList;
+    private List<RvVideosItem> mRvVideosItemList;
     private OnItemClickListener mListener;
 
     public interface OnItemClickListener  {
@@ -28,7 +28,7 @@ public class RvVideosAdapter extends RecyclerView.Adapter<RvVideosAdapter.RvVide
         mListener = listener;
     }
 
-    public RvVideosAdapter(Context context, ArrayList<RvVideosItem> rvVideosItemList) {
+    public RvVideosAdapter(Context context, List<RvVideosItem> rvVideosItemList) {
         mContext = context;
         mRvVideosItemList = rvVideosItemList;
     }

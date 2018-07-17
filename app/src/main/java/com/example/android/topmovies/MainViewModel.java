@@ -3,23 +3,25 @@ package com.example.android.topmovies;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
+import android.view.MenuItem;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
 
-    private MutableLiveData<ArrayList<RvMainItem>> rvMainItems;
+    private LiveData<List<RvMainItem>> rvMainItems;
+    public MenuItem optionsItem;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
 
         AppDatabase database = AppDatabase.getsInstance(this.getApplication());
-        rvMainItems  = database.rvMainItemDao().getAll();
+        rvMainItems = database.rvMainItemDao().getAll();
     }
 
-    public LiveData<ArrayList<RvMainItem>> getRvMainItems() {
+    public LiveData<List<RvMainItem>> getRvMainItems() {
         return rvMainItems;
     }
+
 }

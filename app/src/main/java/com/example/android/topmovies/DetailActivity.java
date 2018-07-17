@@ -1,7 +1,6 @@
 package com.example.android.topmovies;
 
 import android.app.ProgressDialog;
-import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -29,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DetailActivity extends AppCompatActivity implements RvVideosAdapter.OnItemClickListener {
 
@@ -50,15 +50,15 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
 
     private EmptyRecyclerView mRvVideos;
     private RvVideosAdapter mRvVideosItemAdapter;
-    public ArrayList<RvVideosItem> mRvVideosItemList;
+    public List<RvVideosItem> mRvVideosItemList;
 
     private EmptyRecyclerView mRvReviews;
     private RvReviewsAdapter mRvReviewsItemAdapter;
-    public ArrayList<RvReviewsItem> mRvReviewsItemList;
+    public List<RvReviewsItem> mRvReviewsItemList;
 
     private AppDatabase mDb;
     Button mButton;
-    private LiveData<RvMainItem> mDbRvMainItem;
+    RvMainItem mDbRvMainItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +98,14 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
 
         mButton = findViewById(R.id.button_favorite);
 
-        mDbRvMainItem = mDb.rvMainItemDao().loadRvMainItemById(rvMainItemObject.getId());
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDbRvMainItem = mDb.rvMainItemDao().loadRvMainItemById(rvMainItemObject.getId());
+
+            }
+        });
+
 
 
         if (mDbRvMainItem != null) {
@@ -176,6 +183,7 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
 
                                 mRvVideosItemAdapter = new RvVideosAdapter(DetailActivity.this, mRvVideosItemList);
                                 mRvVideos.setAdapter(mRvVideosItemAdapter);
+                                mRvVideosItemAdapter.notifyDataSetChanged();
                                 mRvVideosItemAdapter.setOnItemClickListener(DetailActivity.this);
 
                             } catch (JSONException e) {
@@ -235,6 +243,8 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
 
                                 mRvReviewsItemAdapter = new RvReviewsAdapter(DetailActivity.this, mRvReviewsItemList);
                                 mRvReviews.setAdapter(mRvReviewsItemAdapter);
+                                mRvReviewsItemAdapter.notifyDataSetChanged();
+
 
                             } catch (JSONException e) {
                                 e.printStackTrace();

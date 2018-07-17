@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements RvMainItemAdapter.OnItemClickListener {
 
@@ -54,27 +55,29 @@ public class MainActivity extends AppCompatActivity implements RvMainItemAdapter
 
     private RecyclerView mRecyclerView;
     private RvMainItemAdapter mRvMainItemAdapter;
-    private ArrayList<RvMainItem> mRvMainItemList;
+    private List<RvMainItem> mRvMainItemList;
     private RequestQueue mRequestQueue;
 
     private AppDatabase mDb;
-
+    private MainViewModel mMainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setTitle("Favorite Movies");
 
         mDb = AppDatabase.getsInstance(getApplicationContext());
+        mMainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
         mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
 
-
-        parseFavorite();
-
+        if (mMainViewModel.optionsItem != null) {
+            onOptionsItemSelected(mMainViewModel.optionsItem);} else {
+            getSupportActionBar().setTitle("Favorite Movies");
+            parseFavorite();
+        }
     }
 
     private void parseJson() {
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements RvMainItemAdapter
 
                                 mRvMainItemAdapter = new RvMainItemAdapter(MainActivity.this, mRvMainItemList);
                                 mRecyclerView.setAdapter(mRvMainItemAdapter);
+                                mRvMainItemAdapter.notifyDataSetChanged();
                                 mRvMainItemAdapter.setOnItemClickListener(MainActivity.this);
 
                             } catch (JSONException e) {
@@ -154,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements RvMainItemAdapter
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        mMainViewModel.optionsItem = item;
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sort_popular:
@@ -177,14 +182,16 @@ public class MainActivity extends AppCompatActivity implements RvMainItemAdapter
 
     public void parseFavorite(){
 
-        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.getRvMainItems().observe(this, new Observer<ArrayList<RvMainItem>>() {
+        mMainViewModel.getRvMainItems().observe(this, new Observer<List<RvMainItem>>() {
             @Override
-            public void onChanged(@Nullable ArrayList<RvMainItem> rvMainItems) {
-                mRvMainItemAdapter = new RvMainItemAdapter(MainActivity.this, rvMainItems);
+            public void onChanged(@Nullable List<RvMainItem> rvMainItems) {
+                mRvMainItemList =  rvMainItems;
+                mRvMainItemAdapter = new RvMainItemAdapter(MainActivity.this, mRvMainItemList);
                 mRecyclerView.setAdapter(mRvMainItemAdapter);
+                mRvMainItemAdapter.notifyDataSetChanged();
                 mRvMainItemAdapter.setOnItemClickListener(MainActivity.this);
             }
+
         });
 
     }
