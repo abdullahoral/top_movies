@@ -8,4 +8,7 @@
         android:id="@+id/menu_sort_top"
         android:title="Top Movies"/>
 
+    <item
+        android:id="@+id/menu_sort_favorite"
+        android:title="Favorite Movies"/>
 </menu>

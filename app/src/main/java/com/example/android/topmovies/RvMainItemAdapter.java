@@ -22,6 +22,7 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
     private ArrayList<RvMainItem> mRvMainItemList;
     private OnItemClickListener mListener;
 
+
     public interface OnItemClickListener  {
         void onItemClick  (int position);
     }
@@ -38,7 +39,7 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
     @NonNull
     @Override
     public RvMainItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.rv_main_item, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.rv_poster_item, parent, false);
         return new RvMainItemViewHolder(v);
 
     }
@@ -48,7 +49,7 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
 
         RvMainItem currentRvMainItem = mRvMainItemList.get(position);
 
-        String imageUrl = currentRvMainItem.getmImageUrl();
+        String imageUrl = currentRvMainItem.getImageUrl();
 
         Picasso.with(mContext)
                 .load(imageUrl)
@@ -58,7 +59,23 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
 
     @Override
     public int getItemCount() {
+        if(mRvMainItemList == null) {
+            return 0;
+        }
         return mRvMainItemList.size();
+    }
+
+    public ArrayList<RvMainItem> getmRvMainItemList() {
+        return mRvMainItemList;
+    }
+
+    /**
+     * When data changes, this method updates the list of taskEntries
+     * and notifies the adapter to use the new values on it
+     */
+    public void setmRvMainItemList(ArrayList<RvMainItem> rvMainItems) {
+        mRvMainItemList = rvMainItems;
+        notifyDataSetChanged();
     }
 
     public class RvMainItemViewHolder extends RecyclerView.ViewHolder{
@@ -82,4 +99,5 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
             });
         }
     }
+
 }
