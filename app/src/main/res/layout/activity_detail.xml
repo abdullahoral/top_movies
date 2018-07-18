@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="4dp"
-            android:text="Original Title"
+            tools:text="Original Title"
             android:textColor="@android:color/black"
             android:textSize="30sp" />
 
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="4dp"
-            android:text="Release Date"
+            tools:text="Release Date"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="4dp"
-            android:text="Vote Average"
+            tools:text="Vote Average"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 
@@ -55,8 +55,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="4dp"
-            android:text="Mark As
-Favorite"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 
@@ -66,7 +64,7 @@ Favorite"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="4dp"
-            android:text="Overview"
+            tools:text="Overview"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 

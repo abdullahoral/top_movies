@@ -8,6 +8,8 @@ import android.view.View;
     public class EmptyRecyclerView extends RecyclerView {
 
         private View emptyView;
+        private int mScrollPosition;
+
 
         final private AdapterDataObserver observer = new AdapterDataObserver() {
             @Override

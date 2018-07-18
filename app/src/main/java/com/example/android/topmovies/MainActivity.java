@@ -11,11 +11,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -30,6 +30,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements RvMainItemAdapter.OnItemClickListener {
 
@@ -53,31 +56,44 @@ public class MainActivity extends AppCompatActivity implements RvMainItemAdapter
     private static final String URL_POPULAR = BASE_URL + SORT_POPULAR + API_KEY;
     private static final String URL_TOP_RATED = BASE_URL + SORT_TOP_RATED + API_KEY;
 
-    private RecyclerView mRecyclerView;
+    public static final String KEY_MOVIE = "rvMainItemObject";
+
+
     private RvMainItemAdapter mRvMainItemAdapter;
     private List<RvMainItem> mRvMainItemList;
+
     private RequestQueue mRequestQueue;
 
     private AppDatabase mDb;
     private MainViewModel mMainViewModel;
 
+    private MenuItem mFavoriteMenuItem;
+
+    @BindView(R.id.recycler_view) EmptyRecyclerView mRecyclerView;
+    @BindView(R.id.empty_main) LinearLayout mEmptyMain;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         mDb = AppDatabase.getsInstance(getApplicationContext());
         mMainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
-        mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        mRecyclerView.setEmptyView(mEmptyMain);
+
 
         if (mMainViewModel.optionsItem != null) {
             onOptionsItemSelected(mMainViewModel.optionsItem);} else {
-            getSupportActionBar().setTitle("Favorite Movies");
-            parseFavorite();
-        }
+            getSupportActionBar().setTitle("Popular Movies");
+            API_LAST_URL = URL_POPULAR;
+            parseJson();
+       }
+
     }
 
     private void parseJson() {
@@ -113,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements RvMainItemAdapter
 
                                 mRvMainItemAdapter = new RvMainItemAdapter(MainActivity.this, mRvMainItemList);
                                 mRecyclerView.setAdapter(mRvMainItemAdapter);
-                                mRvMainItemAdapter.notifyDataSetChanged();
                                 mRvMainItemAdapter.setOnItemClickListener(MainActivity.this);
 
                             } catch (JSONException e) {
@@ -144,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements RvMainItemAdapter
     public void onItemClick(int position) {
 
         Intent detailIntent = new Intent(this, DetailActivity.class);
-        detailIntent.putExtra("rvMainItemObject", mRvMainItemList.get(position));
+        detailIntent.putExtra(KEY_MOVIE, mRvMainItemList.get(position));
         startActivity(detailIntent);
 
     }
@@ -153,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements RvMainItemAdapter
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
+        mFavoriteMenuItem = menu.findItem(R.id.menu_sort_favorite);
         return true;
     }
 
@@ -182,18 +198,22 @@ public class MainActivity extends AppCompatActivity implements RvMainItemAdapter
 
     public void parseFavorite(){
 
+        mRvMainItemList = new ArrayList<>();
         mMainViewModel.getRvMainItems().observe(this, new Observer<List<RvMainItem>>() {
             @Override
             public void onChanged(@Nullable List<RvMainItem> rvMainItems) {
                 mRvMainItemList =  rvMainItems;
-                mRvMainItemAdapter = new RvMainItemAdapter(MainActivity.this, mRvMainItemList);
-                mRecyclerView.setAdapter(mRvMainItemAdapter);
-                mRvMainItemAdapter.notifyDataSetChanged();
-                mRvMainItemAdapter.setOnItemClickListener(MainActivity.this);
+                if (mMainViewModel.optionsItem == mFavoriteMenuItem){
+                    mRvMainItemAdapter = new RvMainItemAdapter(MainActivity.this, mRvMainItemList);
+                    mRecyclerView.setAdapter(mRvMainItemAdapter);
+                    mRvMainItemAdapter.setOnItemClickListener(MainActivity.this);
+                }
+
             }
-
         });
-
+        mRvMainItemAdapter = new RvMainItemAdapter(MainActivity.this, mRvMainItemList);
+        mRecyclerView.setAdapter(mRvMainItemAdapter);
+        mRvMainItemAdapter.setOnItemClickListener(MainActivity.this);
     }
 
     public boolean isOnline() {

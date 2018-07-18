@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by User on 06-Mar-18.
  */
@@ -52,13 +55,14 @@ public class RvReviewsAdapter extends RecyclerView.Adapter<RvReviewsAdapter.RvRe
 
     public class RvReviewsItemViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView mReviewAuthor;
-        public TextView mReviewContent;
+
+        @BindView(R.id.review_author) TextView mReviewAuthor;
+        @BindView(R.id.review_content) TextView mReviewContent;
+
 
         public RvReviewsItemViewHolder(View itemView) {
             super(itemView);
-            mReviewAuthor = itemView.findViewById(R.id.review_author);
-            mReviewContent = itemView.findViewById(R.id.review_content);
+            ButterKnife.bind(this, itemView);
 
         }
     }

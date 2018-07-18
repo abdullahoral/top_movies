@@ -12,6 +12,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by User on 06-Mar-18.
  */
@@ -21,7 +24,6 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
     private Context mContext;
     private List<RvMainItem> mRvMainItemList;
     private OnItemClickListener mListener;
-
 
     public interface OnItemClickListener  {
         void onItemClick  (int position);
@@ -80,11 +82,11 @@ public class RvMainItemAdapter extends RecyclerView.Adapter<RvMainItemAdapter.Rv
 
     public class RvMainItemViewHolder extends RecyclerView.ViewHolder{
 
-        public ImageView mImageView;
+        @BindView(R.id.image_main) ImageView mImageView;
 
         public RvMainItemViewHolder(View itemView) {
             super(itemView);
-            mImageView = itemView.findViewById(R.id.image_main);
+            ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

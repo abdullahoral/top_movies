@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -30,6 +31,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class DetailActivity extends AppCompatActivity implements RvVideosAdapter.OnItemClickListener {
 
     private static final String TAG = "DetailActivity";
@@ -46,30 +50,44 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
     private static final String REVIEWS_AUTHOR = "author";
     private static final String REVIEWS_CONTENT = "content";
 
-    private RequestQueue mRequestQueue;
+    public static final String KEY_MOVIE = "rvMainItemObject";
 
-    private EmptyRecyclerView mRvVideos;
+    private RequestQueue mRequestQueue;
     private RvVideosAdapter mRvVideosItemAdapter;
     public List<RvVideosItem> mRvVideosItemList;
 
-    private EmptyRecyclerView mRvReviews;
     private RvReviewsAdapter mRvReviewsItemAdapter;
     public List<RvReviewsItem> mRvReviewsItemList;
 
     private AppDatabase mDb;
-    Button mButton;
     RvMainItem mDbRvMainItem;
+
+    @BindView(R.id.image_detail) ImageView imageView;
+    @BindView(R.id.text_original_title) TextView textViewOriginalTitle;
+    @BindView(R.id.text_overview) TextView textViewOverview;
+    @BindView(R.id.text_vote_average) TextView textViewVoteAverage;
+    @BindView(R.id.text_release_date) TextView textViewReleaseDate;
+
+    @BindView(R.id.button_favorite) Button mButton;
+
+    @BindView(R.id.rv_videos) EmptyRecyclerView mRvVideos;
+    @BindView(R.id.empty_videos) LinearLayout mEmptyVideos;
+
+    @BindView(R.id.rv_reviews) EmptyRecyclerView mRvReviews;
+    @BindView(R.id.empty_reviews) LinearLayout mEmptyReviews;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        ButterKnife.bind(this);
         getSupportActionBar().setTitle("Movie Details");
 
         mDb = AppDatabase.getsInstance(getApplicationContext());
 
         Intent intent = getIntent();
-        final RvMainItem rvMainItemObject = intent.getParcelableExtra("rvMainItemObject");
+        final RvMainItem rvMainItemObject = intent.getParcelableExtra(KEY_MOVIE);
 
         String imageUrl = rvMainItemObject.getImageUrl();
         String originalTitle = rvMainItemObject.getOriginalTitle();
@@ -81,12 +99,6 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
         VIDEOS_URL = BASE_URL + MOVIE_ID + "/videos?api_key=" + API_KEY;
         REVIEWS_URL = BASE_URL + MOVIE_ID + "/reviews?api_key=" + API_KEY;
 
-        ImageView imageView = findViewById(R.id.image_detail);
-        TextView textViewOriginalTitle = findViewById(R.id.text_original_title);
-        TextView textViewOverview = findViewById(R.id.text_overview);
-        TextView textViewVoteAverage = findViewById(R.id.text_vote_average);
-        TextView textViewReleaseDate = findViewById(R.id.text_release_date);
-
         Picasso.with(this)
                 .load(imageUrl)
                 .into(imageView);
@@ -96,19 +108,16 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
         textViewVoteAverage.setText("Vote: " + voteAverage);
         textViewReleaseDate.setText("Release Date: " + releaseDate);
 
-        mButton = findViewById(R.id.button_favorite);
-
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
                 mDbRvMainItem = mDb.rvMainItemDao().loadRvMainItemById(rvMainItemObject.getId());
-
             }
         });
 
-
-
-        if (mDbRvMainItem != null) {
+        if (mDbRvMainItem == null) {
+            mButton.setText("MARK AS FAVORITE");
+        } else {
             mButton.setText("MARK AS UNFAVORITE");
         }
 
@@ -117,30 +126,24 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
 
             public void onClick(View v)
             {
-                AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mDbRvMainItem == null) {
+                if (mDbRvMainItem == null) {
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
                             mDb.rvMainItemDao().insertMovie(rvMainItemObject);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mButton.setText("MARK AS UNFAVORITE");
-                                }
-                            });
 
-                        } else {
-                            mDb.rvMainItemDao().deleteMovie(rvMainItemObject);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mButton.setText("MARK AS FAVORITE");
-                                }
-                            });
                         }
-                    }
-                });
-
+                    });
+                    mButton.setText("MARK AS UNFAVORITE");
+                } else {
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDb.rvMainItemDao().deleteMovie(rvMainItemObject);
+                        }
+                    });
+                    mButton.setText("MARK AS FAVORITE");
+                }
             }
         });
 
@@ -152,10 +155,9 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
 
         if (isOnline()) {
 
-            mRvVideos = findViewById(R.id.rv_videos);
             mRvVideos.setHasFixedSize(true);
             mRvVideos.setLayoutManager(new LinearLayoutManager(this));
-            mRvVideos.setEmptyView(findViewById(R.id.empty_videos));
+            mRvVideos.setEmptyView(mEmptyVideos);
 
             mRvVideosItemList = new ArrayList<>();
 
@@ -213,10 +215,9 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
     private void parseReviewsJson() {
 
         if (isOnline()) {
-            mRvReviews = findViewById(R.id.rv_reviews);
             mRvReviews.setHasFixedSize(true);
             mRvReviews.setLayoutManager(new LinearLayoutManager(this));
-            mRvReviews.setEmptyView(findViewById(R.id.empty_reviews));
+            mRvReviews.setEmptyView(mEmptyReviews);
 
             mRvReviewsItemList = new ArrayList<>();
 
@@ -288,9 +289,11 @@ public class DetailActivity extends AppCompatActivity implements RvVideosAdapter
     @Override
     protected void onResume() {
         super.onResume();
-        if (mDbRvMainItem != null) {
+
+        if (mDbRvMainItem == null) {
+            mButton.setText("MARK AS FAVORITE");
+        } else {
             mButton.setText("MARK AS UNFAVORITE");
         }
-
     }
 }

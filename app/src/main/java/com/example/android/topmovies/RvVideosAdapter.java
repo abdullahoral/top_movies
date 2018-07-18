@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by User on 06-Mar-18.
  */
@@ -59,12 +62,12 @@ public class RvVideosAdapter extends RecyclerView.Adapter<RvVideosAdapter.RvVide
 
     public class RvVideosItemViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView mVideoName;
+        @BindView(R.id.video_name) TextView mVideoName;
+
 
         public RvVideosItemViewHolder(View itemView) {
             super(itemView);
-            mVideoName = itemView.findViewById(R.id.video_name);
-
+            ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
